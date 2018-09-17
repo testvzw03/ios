@@ -8,8 +8,8 @@
 
 
 ### iPad
-<img src="https://github.com/dvs124/ios/blob/develop/NavigationWithMenu/Demo/iPad.gif" width="430">
+<img src="https://github.com/dot124/ios/blob/develop/NavigationWithMenu/Demo/iPad.gif" width="430">
 
 ### iPhone
 
-<img src="https://github.com/dvs124/ios/blob/develop/NavigationWithMenu/Demo/iPhone.gif" width="250">
+<img src="https://github.com/dot124/ios/blob/develop/NavigationWithMenu/Demo/iPhone.gif" width="250">
