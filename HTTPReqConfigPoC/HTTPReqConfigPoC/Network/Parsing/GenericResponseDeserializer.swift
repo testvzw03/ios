@@ -3,26 +3,13 @@ import UIKit
 class GenericResponseDeserializer<T:ResponseProtocol>: ResponseDeserializer {
 
     //Should return Codable object?
-    func parse(_ data: Data?) -> (ResponseProtocol?, NSError?) {
+    func parse(_ data: Data?) throws -> (ResponseProtocol?) {
         
-        var responseObj:ResponseProtocol? = nil
-        var parsingError:NSError? = nil
-
-        guard data != nil else {
+        guard let dataNonNull = data else {
             
-            let err = NSError(domain: "Parsing Error", code: 500, userInfo: ["Description":"Parsing error. Data is empty."])
-            return (nil, err)
-        }
-        do {
-            responseObj = try JSONDecoder().decode(T.self, from: data!)
-            parsingError = nil
-        }
-        catch let error as NSError {
-            parsingError = error
-            responseObj = nil
+            throw NSError(domain: "Parsing Error", code: 500, userInfo: ["Description":"Parsing error. Data is empty."])
         }
         
-        return (responseObj, parsingError)
+        return try JSONDecoder().decode(T.self, from: dataNonNull)
     }
-
 }

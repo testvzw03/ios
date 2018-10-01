@@ -136,13 +136,6 @@
 			path = Demo;
 			sourceTree = "<group>";
 		};
-		37E831F9214F3A1E0068D468 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
 		37E831FD214F3DA30068D468 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -197,7 +190,6 @@
 			children = (
 				402CA66A21214CE00098CCB6 /* Json */,
 				402CA663211FE7B90098CCB6 /* Network */,
-				37E831F9214F3A1E0068D468 /* Base */,
 				402CA651211FC16C0098CCB6 /* AppDelegate.swift */,
 				379A44A72122D48C00D309B2 /* Demo */,
 				402CA655211FC16C0098CCB6 /* Main.storyboard */,

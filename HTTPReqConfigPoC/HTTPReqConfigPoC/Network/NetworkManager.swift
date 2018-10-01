@@ -57,7 +57,7 @@ class NetworkManager: NSObject, URLSessionTaskDelegate, URLSessionDelegate {
                 
                 //"SYSTEM ERROR":Error trying to connect to server. Show not reachable to server error.
                 Utils.logMessage(message: "Unable to connect to server. \(err.localizedDescription)")
-                ErrorUtils.showConnectivityError(error: err)
+                ErrorUtils.showError(ErrorState.networkError, error: err, statusCode: nil)
                 
             } else if let httpResponse = response as? HTTPURLResponse {
                 
@@ -68,7 +68,7 @@ class NetworkManager: NSObject, URLSessionTaskDelegate, URLSessionDelegate {
                 
                 //"SYSTEM ERROR":Request completed incorrectly.
                 Utils.logMessage(message: "Unknown error. URL Response is nil.")
-                ErrorUtils.showUnknownError()
+                ErrorUtils.showError(ErrorState.unknownError, error: nil, statusCode: nil)
             }
         }
         
@@ -140,39 +140,38 @@ class NetworkManager: NSObject, URLSessionTaskDelegate, URLSessionDelegate {
         
         let httpCode:ErrorCode = ErrorCode(errorCode: httpResponse.statusCode)
 
-        //let parseTuple:(ResponseProtocol?, NSError?) = (nil,nil)
-        
-        let parseTuple = request.requestConfig.responseParser().parse(data)
-        
-        if (httpCode == .serverError || httpCode == .unknown || httpCode == .redirection) {
+        do {
+            let response = try request.requestConfig.responseParser().parse(data)
             
-            //Server or unknown or redirection. (Currently redirection support not implemented)
-            Utils.logMessage(message: "Request Completed with error(server or unknown)")
-            ErrorUtils.showServerError(statusCode: httpResponse.statusCode)
-            
-        } else if let parseError = parseTuple.1 {
+            if (httpCode == .serverError || httpCode == .unknown || httpCode == .redirection) {
+                
+                //Server or unknown or redirection. (Currently redirection support not implemented)
+                Utils.logMessage(message: "Request Completed with error(server or unknown)")
+                ErrorUtils.showError(ErrorState.serverError, error: nil, statusCode: httpResponse.statusCode)
+                
+            } else if httpCode == .unauthorized {
+                
+                //Unauthorized.
+                Utils.logMessage(message: response?.statusMessage)
+                ErrorUtils.showError(ErrorState.authorizationError, error: nil, statusCode: nil)
+                
+            } else if httpCode == .badRequest {
+                
+                //Bad Request. Send error to view controller to handle.
+                Utils.logMessage(message: response?.statusMessage ?? "Bad Request")
+                callback(response, NSError(domain: NSURLErrorDomain, code: httpResponse.statusCode, userInfo: nil))
+                
+            } else {
+                
+                //All OK
+                Utils.logMessage(message: "All Ok")
+                callback(response, nil)
+            }
+        } catch {
             
             //Error Parsing the response
             Utils.logMessage(message: "Call success but incomplete response/parsing failed.")
-            ErrorUtils.showParserError(message:parseError.localizedDescription)
-            
-        } else if httpCode == .unauthorized {
-           
-            //Unauthorized.
-            Utils.logMessage(message: parseTuple.0?.statusMessage ?? "Unauthorized")
-            ErrorUtils.showAuthorizationError(message: parseTuple.0?.statusMessage ?? "Unauthorized")
-            
-        } else if httpCode == .badRequest {
-            
-            //Bad Request. Send error to view controller to handle.
-            Utils.logMessage(message: parseTuple.0?.statusMessage ?? "Bad Request")
-            callback(parseTuple.0, NSError(domain: NSURLErrorDomain, code: httpResponse.statusCode, userInfo: nil))
-            
-        } else {
-            
-            //All OK
-            Utils.logMessage(message: "All Ok")
-            callback(parseTuple.0, parseTuple.1)
+            ErrorUtils.showError(ErrorState.parseError, error: error, statusCode: nil)
         }
     }
 }

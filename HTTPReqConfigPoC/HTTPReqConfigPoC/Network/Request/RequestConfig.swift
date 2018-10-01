@@ -138,10 +138,8 @@ enum RequestConfig {
         var parser:ResponseDeserializer! = nil
         
         switch self {
-        case .testAllOk:
-            parser = GenericResponseDeserializer<TestResponse>()
         default:
-            parser = GenericResponseDeserializer<BaseResponse>()
+            parser = GenericResponseDeserializer<TestResponse>()
         }
         
         return parser
