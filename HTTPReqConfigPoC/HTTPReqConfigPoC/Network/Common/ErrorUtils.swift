@@ -1,62 +1,39 @@
 import UIKit
 
 class ErrorUtils: NSObject {
-
-    static func showConnectivityError(error:Error) {
-        
-        let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as! ErrorViewController
-        
-        let nsErr = error as NSError
-        errorViewController.title = nsErr.domain
-        errorViewController.errorMessage = nsErr.localizedDescription
-        
-        let navController = UINavigationController(rootViewController: errorViewController)
-        
-        UIApplication.shared.keyWindow?.rootViewController?.present(navController, animated: true, completion: {})
-    }
     
-    static func showParserError(message:String) {
+    static func showError(_ errorState:ErrorState, error: Error?, statusCode: Int?) {
         
-        let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as! ErrorViewController
+        guard let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as? ErrorViewController else {
+            return
+        }
         
-        errorViewController.title = "Call Completed, Parser Error"
-        errorViewController.errorMessage = message
+        var title:String?
+        var errorMessage:String?
         
-        let navController = UINavigationController(rootViewController: errorViewController)
+        let nsErr = error as NSError?
         
-        UIApplication.shared.keyWindow?.rootViewController?.present(navController, animated: true, completion: {})
-    }
-    
-    static func showUnknownError() {
+        switch errorState {
+        case .authorizationError:
+            title = "Unauthorized"
+            errorMessage = "User not authorized. This could be due to the session being timed out. Please log in again."
+        case .networkError:
+            title = nsErr?.domain
+            errorMessage = nsErr?.localizedDescription
+        case .parseError:
+            title = "Call completed, Parser error"
+            errorMessage = nsErr?.localizedDescription
+        case .serverError:
+            let statusCodeNonNull = statusCode ?? -1
+            title =  String(format: "Server Error %d", statusCodeNonNull)
+            errorMessage = "Incomplete or unknown response from server."
+        case .unknownError:
+            title = "Unknown Error"
+            errorMessage = "Network Request completed incorrectly due to an unknown error."
+        }
         
-        let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as! ErrorViewController
-        
-        errorViewController.title = "Unknown Error"
-        errorViewController.errorMessage = "Network Request completed incorrectly due to an unknown error."
-        
-        let navController = UINavigationController(rootViewController: errorViewController)
-        
-        UIApplication.shared.keyWindow?.rootViewController?.present(navController, animated: true, completion: {})
-    }
-    
-    static func showAuthorizationError(message:String = "User not authorized. This could be due to the session being timed out. Please log in again.") {
-        
-        let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as! ErrorViewController
-        
-        errorViewController.title = "Unauthorized"
-        errorViewController.errorMessage = message
-        
-        let navController = UINavigationController(rootViewController: errorViewController)
-        
-        UIApplication.shared.keyWindow?.rootViewController?.present(navController, animated: true, completion: {})
-    }
-    
-    static func showServerError(statusCode:Int) {
-        
-        let errorViewController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "ErrorViewController") as! ErrorViewController
-        
-        errorViewController.title = "Server Error \(statusCode)"
-        errorViewController.errorMessage = "Incomplete or unknown response from server."
+        errorViewController.title = title
+        errorViewController.errorMessage = errorMessage
         
         let navController = UINavigationController(rootViewController: errorViewController)
         

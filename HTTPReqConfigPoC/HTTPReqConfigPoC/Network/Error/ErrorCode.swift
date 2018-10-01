@@ -54,3 +54,11 @@ enum ErrorCode: Int {
         }
     }
 }
+
+enum ErrorState {
+    case networkError
+    case parseError
+    case unknownError
+    case authorizationError
+    case serverError
+}

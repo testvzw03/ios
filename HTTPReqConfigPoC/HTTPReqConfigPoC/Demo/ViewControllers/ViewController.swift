@@ -80,7 +80,7 @@ class ViewController: UIViewController {
             
             if let responseNonNull = response {
                 Utils.showAlert(self, title: "", message: (responseNonNull.statusMessage)!)
-                Utils.logMessage(message: "Response received. C::\(responseNonNull.statusMessage)")
+                Utils.logMessage(message: "Response received. C::\(responseNonNull.statusMessage ?? "")")
             }
         }
     }

@@ -2,8 +2,8 @@ import UIKit
 
 struct TestResponse : ResponseProtocol {
 
-    var statusCode: Int!
-    var statusMessage: String!
+    var statusCode: Int?
+    var statusMessage: String?
 
     var a:Int? = 0
     var b:Int? = 0
